@@ -122,19 +122,22 @@ namespace CNC.Controls.Viewer
 
         private void RenderControl_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
-            textOverlay.Visibility = AppConfig.Settings.GCodeViewer.ShowTextOverlay ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
+            if (AppConfig.Settings.GCodeViewer != null)
+            { 
+                textOverlay.Visibility = AppConfig.Settings.GCodeViewer.ShowTextOverlay ? System.Windows.Visibility.Visible : System.Windows.Visibility.Hidden;
 
-            if (!keyboardMappingsOk && DataContext is GrblViewModel)
-            {
-                KeypressHandler keyboard = (DataContext as GrblViewModel).Keyboard;
+                if (!keyboardMappingsOk && DataContext is GrblViewModel)
+                {
+                    KeypressHandler keyboard = (DataContext as GrblViewModel).Keyboard;
 
-                keyboardMappingsOk = true;
+                    keyboardMappingsOk = true;
 
-                keyboard.AddHandler(Key.V, ModifierKeys.Control, ResetView);
-                keyboard.AddHandler(Key.R, ModifierKeys.Control, RestoreView);
-                keyboard.AddHandler(Key.G, ModifierKeys.Control, ToggleGrid);
-                keyboard.AddHandler(Key.J, ModifierKeys.Control, ToggleJobEnvelope);
-                keyboard.AddHandler(Key.W, ModifierKeys.Control, ToggleWorkEnvelope);
+                    keyboard.AddHandler(Key.V, ModifierKeys.Control, ResetView);
+                    keyboard.AddHandler(Key.R, ModifierKeys.Control, RestoreView);
+                    keyboard.AddHandler(Key.G, ModifierKeys.Control, ToggleGrid);
+                    keyboard.AddHandler(Key.J, ModifierKeys.Control, ToggleJobEnvelope);
+                    keyboard.AddHandler(Key.W, ModifierKeys.Control, ToggleWorkEnvelope);
+                }
             }
         }
     }

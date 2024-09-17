@@ -273,6 +273,20 @@ namespace CNC.Controls
             Model.Blocks = Blocks;
         }
 
+        public String GetGcodeAsString()
+        {
+            using (var stream = new StringWriter())
+            {
+                using (new UIUtils.WaitCursor())
+                {
+                    foreach (DataRow line in Program.Data.Rows)
+                        stream.WriteLine((string)line["Data"]);
+                }
+
+                return stream.ToString();
+            }
+        }
+
         public void Save()
         {
             SaveFileDialog saveDialog = new SaveFileDialog()

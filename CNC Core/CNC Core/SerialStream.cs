@@ -46,6 +46,7 @@ using System.IO.Ports;
 using System.Management;
 using System.Windows.Threading;
 using System.Collections.ObjectModel;
+using System.Windows.Markup;
 
 namespace CNC.Core
 {

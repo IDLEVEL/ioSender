@@ -293,6 +293,8 @@ namespace CNC.Controls
         private bool? MPGactive = null;
         private Config _base = null;
 
+        private bool alwaysShowPortWindow = true;
+
         public string FileName { get; private set; }
 
         private static readonly Lazy<AppConfig> settings = new Lazy<AppConfig>(() => new AppConfig());
@@ -502,7 +504,7 @@ namespace CNC.Controls
             if (!string.IsNullOrEmpty(port))
                 selectPort = false;
 
-            if (!selectPort)
+            if (!alwaysShowPortWindow && !selectPort)
             {
                 if (!string.IsNullOrEmpty(port))
                     setPort(port, baud);
@@ -521,7 +523,7 @@ namespace CNC.Controls
 #endif
             }
 
-            if ((Comms.com == null || !Comms.com.IsOpen) && string.IsNullOrEmpty(port))
+            if (alwaysShowPortWindow || ((Comms.com == null || !Comms.com.IsOpen) && string.IsNullOrEmpty(port)))
             {
                 PortDialog portsel = new PortDialog();
 

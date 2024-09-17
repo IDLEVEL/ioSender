@@ -43,6 +43,13 @@ using System.Windows.Input;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CNC.Core;
+using System.Net.Http;
+using System.Text;
+using System.Threading.Tasks;
+using System;
+using System.Threading;
+using System.IO;
+using System.Net;
 
 namespace CNC.Controls
 {
@@ -125,6 +132,114 @@ namespace CNC.Controls
                 mdi.Tag = "MDI";
             if(DataContext != null)
                 (DataContext as GrblViewModel).PropertyChanged += OnDataContextPropertyChanged;
+        }
+
+        private void Upload_And_Run(object sender, RoutedEventArgs e)
+        {
+            string IP = null;
+
+            var ipRegex = new System.Text.RegularExpressions.Regex("IP=(?<IP>\\d+\\.\\d+\\.(\\d+).\\d+)");
+
+            foreach (string opt in GrblInfo.SystemInfo)
+            {
+                var match = ipRegex.Match(opt);
+
+                if(match.Success)
+                {
+                    IP = match.Groups["IP"].Value;
+                    break;
+                }
+            }
+
+            if (IP == null)
+            {
+                MessageBox.Show("Machine IP not found");
+                return;
+            }
+
+            var _ = this;
+
+            var gcode = GCode.File.GetGcodeAsString();
+
+            Task.Run(() =>
+            {
+                var fileName = "\\TEMP.GCODE";
+
+                if (_.UploadFile("\\TEMP.GCODE", gcode))
+                {
+                    if (MessageBox.Show($"Run uploaded {fileName} file?", "Sure?",
+                        MessageBoxButton.YesNo, MessageBoxImage.Question,
+                        MessageBoxResult.No) == MessageBoxResult.Yes)
+                    {
+                        Comms.com.WriteCommand($"[ESP220]{fileName}\n");
+                    }
+                }
+            });
+        }
+
+        public bool UploadFile(string fileName, String contentData)
+        {
+            this.Dispatcher.Invoke(() => uploadStatus.Content = "Uploading..");
+
+            var boundary = "----WebKitFormBoundaryHEwnGACfAY4a1D2c";
+
+            var content_src = $"--{boundary}\r\nContent-Disposition: form-data; name=\"path\"\r\n\r\n/\r\n" +
+            $"--{boundary}\r\nContent-Disposition: form-data; name=\"/{fileName}S\"\r\n\r\n{contentData.Length}\r\n" +
+            $"--{boundary}\r\nContent-Disposition: form-data; name=\"myfile[]\"; filename=\"/{fileName}\"\r\n" +
+            $"Content-Type: application/octet-stream\r\n\r\n";
+
+            // Create the request and set parameters
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://192.168.1.71/upload");
+            request.ContentType = $"multipart/form-data; boundary={boundary}";
+
+            request.Method = "POST";
+            request.KeepAlive = true;
+
+            request.Credentials = System.Net.CredentialCache.DefaultCredentials;
+
+            var requestStream = new StreamWriter(request.GetRequestStream(), Encoding.ASCII);
+
+            requestStream.Write(content_src);
+
+            requestStream.Flush();
+
+            int bytesRead;
+
+            byte[] buffer = new byte[2048];
+
+            using (var fileStream = new MemoryStream(Encoding.ASCII.GetBytes(contentData)))
+            {
+                while ((bytesRead = fileStream.Read(buffer, 0, buffer.Length)) != 0)
+                {
+                    requestStream.BaseStream.Write(buffer, 0, bytesRead);
+                }
+
+                requestStream.BaseStream.Flush();
+
+                fileStream.Close();
+            }
+
+            requestStream.Write("\r\n--" + boundary + "--\r\n");
+
+            requestStream.Close();
+
+            using (StreamReader reader = new StreamReader(request.GetResponse().GetResponseStream()))
+            {
+                var result = reader.ReadToEnd();
+
+                if (result.Contains("\"status\":\"Ok\""))
+                {
+                    this.Dispatcher.Invoke(() => uploadStatus.Content = "Uploaded");
+
+                    return true;
+                }
+
+                this.Dispatcher.Invoke(() => uploadStatus.Content = "Upload Fail");
+
+                MessageBox.Show($"Upload Error: {reader.ReadToEnd()}");
+
+                return false;
+            };
         }
     }
 }
