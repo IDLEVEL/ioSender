@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ioSender", "ioSender\ioSender.csproj", "{9492A88B-066D-42AE-9244-3369BE99F37F}"
 EndProject
@@ -27,6 +27,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC Controls Dragknife", "..\CNC Controls Dragknife\CNC Controls Dragknife.csproj", "{9F3AAD0C-0B47-4B55-9725-F8A50B7CA6B0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CNC Converters", "..\CNC Converters\CNC Converters.csproj", "{8F9C264C-D9A5-418A-A1BE-84052059387F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GCode Combiner", "..\GCode Combiner\GCode Combiner.csproj", "{0CD4AB01-4C18-4008-BA57-7F9CBF252278}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -116,8 +118,19 @@ Global
 		{8F9C264C-D9A5-418A-A1BE-84052059387F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8F9C264C-D9A5-418A-A1BE-84052059387F}.Release|x86.ActiveCfg = Release|Any CPU
 		{8F9C264C-D9A5-418A-A1BE-84052059387F}.Release|x86.Build.0 = Release|Any CPU
+		{0CD4AB01-4C18-4008-BA57-7F9CBF252278}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CD4AB01-4C18-4008-BA57-7F9CBF252278}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CD4AB01-4C18-4008-BA57-7F9CBF252278}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0CD4AB01-4C18-4008-BA57-7F9CBF252278}.Debug|x86.Build.0 = Debug|Any CPU
+		{0CD4AB01-4C18-4008-BA57-7F9CBF252278}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CD4AB01-4C18-4008-BA57-7F9CBF252278}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CD4AB01-4C18-4008-BA57-7F9CBF252278}.Release|x86.ActiveCfg = Release|Any CPU
+		{0CD4AB01-4C18-4008-BA57-7F9CBF252278}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {141CC5FB-CCDD-4504-B020-E802DC8E240A}
 	EndGlobalSection
 EndGlobal

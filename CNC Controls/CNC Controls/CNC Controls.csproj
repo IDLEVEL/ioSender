@@ -501,6 +501,10 @@
       <Project>{f245ff89-a838-4d6e-aa40-92cfd3d072d3}</Project>
       <Name>CNC Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\GCode Combiner\GCode Combiner.csproj">
+      <Project>{0cd4ab01-4c18-4008-ba57-7f9cbf252278}</Project>
+      <Name>GCode Combiner</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="App.ico" />

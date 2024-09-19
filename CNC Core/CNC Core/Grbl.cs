@@ -2013,7 +2013,8 @@ namespace CNC.Core
                         }
                     }
 
-                    file.Close();
+                    if(file != null)
+                        file.Close();
                 }
                 catch
                 {
@@ -2133,7 +2134,8 @@ namespace CNC.Core
                         }
                     }
 
-                    file.Close();
+                    if(file != null)
+                        file.Close();
                 }
                 catch
                 {

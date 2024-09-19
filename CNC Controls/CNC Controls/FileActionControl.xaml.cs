@@ -123,5 +123,12 @@ namespace CNC.Controls
         {
             fileChanged = true;
         }
+
+        void btnCombine_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new GCode_Combiner.CombinerWindow();
+
+            window.ShowDialog();
+        }
     }
 }

@@ -444,6 +444,7 @@ namespace CNC.GCode
             AxisCommand axisCommand = AxisCommand.None;
             NGCExpr.FlowControl flowControl = NGCExpr.FlowControl.NoOp;
             List<StrReplace> replace = new List<StrReplace>();
+            string pauseText = string.Empty;
 
             int userMCode = 0;
             bool isScaling = false;
@@ -781,6 +782,14 @@ namespace CNC.GCode
                         case 30:
                             cmdProgramFlow = iv == 30 ? Commands.M30 : (Commands.M0 + iv);
                             modalGroup = ModalGroups.M4;
+
+                            if (iv == 0)
+                            {
+                                pauseText = line.Substring(2);
+                                pos += pauseText.Length;
+                                pauseText = pauseText.Trim();
+                            }
+
                             break;
 
                         case 3:
@@ -1537,9 +1546,9 @@ namespace CNC.GCode
 
                         case Commands.G92:
                             {
-                                var offset = new GCCoordinateSystem(cmdNonModal, gcValues.N, 10, gcValues.XYZ, axisWords);
+                                var offset = new GCCoordinateSystem(cmdNonModal, gcValues.N, 0, gcValues.XYZ, axisWords);
                                 SetG92Offset(offset);
-                                Tokens.Add(new GCCoordinateSystem(cmdNonModal, gcValues.N, 10, gcValues.XYZ, axisWords));
+                                Tokens.Add(new GCCoordinateSystem(cmdNonModal, gcValues.N, 0, gcValues.XYZ, axisWords));
                             }
                             break;
 
@@ -1855,8 +1864,16 @@ namespace CNC.GCode
             // M0, M1, M2, M30
             if (modalGroups.HasFlag(ModalGroups.M4))
             {
-                ProgramEnd = cmdProgramFlow == Commands.M2 || cmdProgramFlow == Commands.M30;
-                Tokens.Add(new GCodeToken(cmdProgramFlow, gcValues.N));
+                if (cmdProgramFlow == Commands.M0)
+                {
+                    ProgramEnd = false;
+                    Tokens.Add(new GCodeM0Command(cmdProgramFlow, gcValues.N, pauseText));
+                }
+                else
+                {
+                    ProgramEnd = cmdProgramFlow == Commands.M2 || cmdProgramFlow == Commands.M30;
+                    Tokens.Add(new GCodeToken(cmdProgramFlow, gcValues.N));
+                }
             }
 
             return true;
@@ -1901,7 +1918,8 @@ namespace CNC.GCode
                         typeof(GCWaitOnInput),
                         typeof(GCAnalogOutput),
                         typeof(GCUserMCommand),
-                        typeof(GCFlowControl)
+                        typeof(GCFlowControl),
+                        typeof(GCodeM0Command),
                     });
                     bin.Serialize(stream, objToSerialize);
                 }
@@ -2158,7 +2176,7 @@ namespace CNC.GCode
                         break;
 
                     default:
-                        block += token.ToString();
+                        block += token.GetType().GetMethod("ToString").Invoke(token, new object[] {});
                         break;
                 }
             }
@@ -2196,6 +2214,23 @@ namespace CNC.GCode
             return Command.ToString().Replace('_', '.');
         }
     }
+    public class GCodeM0Command: GCodeToken
+    {
+        public String PauseText { get; set; }
+        /*
+        public int ViewIndexStart { get; set; }
+        public int ViewIndexEnd { get; set; }
+        */
+        public GCodeM0Command(Commands command, uint lnr, string pauseText) : base(command, lnr)
+        {
+            PauseText = pauseText;
+        }
+        public new string ToString()
+        {
+            return Command.ToString() + " " + PauseText;
+        }
+    }
+
     public class GCAxisCommand3 : GCodeToken
     {
         public GCAxisCommand3()
@@ -3180,7 +3215,7 @@ namespace CNC.GCode
 
         public new string ToString()
         {
-            return base.ToString() + (L > 0 ? "L" + L : "") + "P" + P + (double.IsNaN(R) ? "" : "R" + R.ToInvariantString());
+            return base.ToString() + (L > 0 ? "L" + L : "") + (P > 0 ? ("P" + P) : "") + (double.IsNaN(R) ? "" : "R" + R.ToInvariantString());
         }
     }
 
